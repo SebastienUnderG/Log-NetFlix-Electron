@@ -1,0 +1,55 @@
+html {
+    overflow-y: auto;
+    font-family: sans-serif;
+}
+
+#dropzone {
+    border-radius: 10px;
+    margin: 10px auto;
+    width: 70vw;
+    height: 20vw;
+    border: 3px dotted #4a4a4a;
+    background-image: url("upload.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+
+}
+
+section {
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+@keyframes fade {
+    from {
+        opacity: 100%;
+    }
+    to {
+        opacity: 1%;
+    }
+}
+
+html {
+
+}
+
+.drag {
+    -webkit-app-region: drag;
+}
+
+button {
+    -webkit-app-region: no-drag;
+}
+
+#titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+    border: 1px solid #41557b;
+    border-bottom: 0;
+}
+
