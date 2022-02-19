@@ -38,18 +38,64 @@ html {
     -webkit-app-region: drag;
 }
 
-button {
+
+.margine {
+    margin-left: -3px;
+    margin-right: -3px;
+}
+
+#close-btn {
     -webkit-app-region: no-drag;
 }
 
-#titlebar {
+.fixed {
+    -webkit-app-region: no-drag;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+
+}
+
+.right {
+    right: 0px;
+    display: flex;
+}
+
+.btn {
+    top: 0;
+    right: 0;
+    height: 30px;
+    width: 30px;
+    border-bottom: 0;
+    padding: 2px;
+    background-color: #fae8b9;
+    text-align: center;
+    cursor: pointer;
+
+}
+
+.btn:hover {
+    background-color: #ffe08a;
+}
+
+.jaune {
+    background-color: #ffe08a;
+}
+
+#marginBtn {
+    margin-right: 100px;
+}
+
+#titlebar2 {
+    /*-webkit-app-region: drag;*/
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     width: 100%;
     padding: 2px;
-    box-sizing: border-box;
+
     border: 1px solid #41557b;
     border-bottom: 0;
+    z-index: 1000;
 }
 

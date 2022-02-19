@@ -2,8 +2,13 @@
 import {app, BrowserWindow, ipcMain, Menu} from 'electron';
 import {GetIP} from '../../Export-Log-NetFlix-Chrome/src/getIP';
 import {Appdata} from '../../Export-Log-NetFlix-Chrome/src/appdata';
+import {ConfigFile} from '../../Export-Log-NetFlix-Chrome/src/configFile';
+import {IoJson} from '../../Export-Log-NetFlix-Chrome/src/ioJson';
+import {Cloud} from '../../Export-Log-NetFlix-Chrome/src/cloud';
+import {each} from 'async';
 
 let path = require('path');
+
 
 // const root = path.resolve(__dirname, '../');
 
@@ -12,10 +17,10 @@ function createWindow() {
 
     const mainWindow = new BrowserWindow({
         width: 700,
-        height: 700,
+        height: 1000,
         minWidth: 500,
         minHeight: 100,
-        maxWidth: 700,
+        maxWidth: 1200,
         maxHeight: 1000,
         icon: path.join(__dirname, '../icons/icon128.png'),
         frame: false,
@@ -63,33 +68,139 @@ ipcMain.on('listurl', (event) => {
 
 
     port.on('message', (event) => {
-        const data = event.data
-        console.log(data);
+        const data = event.data;
         setTimeout(() => {
-            port.postMessage({test: 21})
+            port.postMessage({test: 21});
         }, 1000);
-    })
+    });
 
     // MessagePortMain queues messages until the .start() method has been called.
-    port.start()
+    port.start();
 });
 
 
 ipcMain.handle('checkFormatsInterface', async (event: Electron.IpcMainInvokeEvent, url) => {
-    return GetIP.loadURL(url).then((file: any) => {
+    return IoJson.loadURL(url).then((file: any) => {
+        GetIP.checkFormatsInterface(file[0],
+            null,
+            () => {
+                console.log("GEO");
+                thisAppdata.get(GetIP.checkFormatsInterface(file[0]))
+                    .then((fileLocal: any) => {
+                        console.log("->", Object.keys(fileLocal).length, Object.keys(file[0]).length);
+                    }).catch((e) => {
+                    console.error("-> ERREUR", Object.keys(file[0]).length);
+                });
+            },
+            null,
+            null,
+            null,
+            null
+        );
+
         return GetIP.checkFormatsInterface(file[0]);
-    })
-})
-
-
-
-const thisAppdata: Appdata = new Appdata(app);
-
-thisAppdata.getConfig().then((config) => {
-    
+    });
 });
 
+ipcMain.handle('appdata', async (event: Electron.IpcMainInvokeEvent) => {
+    return thisAppdata.pathAppData;
+});
+
+ipcMain.handle('pathAppData', async (event: Electron.IpcMainInvokeEvent) => {
+    return IoJson.listUrlFromDirLength(thisAppdata.pathAppData + '/data/').then((files: Record<string, number>) => {
+        console.log('pathAppData', files);
+        return files;
+
+    });
+});
+
+const thisAppdata: Appdata = new Appdata(app);
+let config: ConfigFile;
+thisAppdata.getConfig().then((configThen) => {
+    config = configThen;
+});
+
+ipcMain.handle('config', async (event: Electron.IpcMainInvokeEvent) => {
+    return thisAppdata.getConfig();
+});
+
+// const cloud: Cloud = new Cloud();
+let cloud: Cloud = null;
+
+ipcMain.handle('majCloud', async (event: Electron.IpcMainInvokeEvent, bouton) => {
+    console.log("BOUTON MAIN", bouton, cloud);
+    if (!cloud && config.serviceAccount) {
+        cloud = new Cloud(config.serviceAccount);
+        IoJson.listUrlFromDir(thisAppdata.pathAppData + '/data/')
+            .then((files: string[]) => {
+                if (files.length > 0) {
+                    return true;
+                }
+            });
+    }
+    if (cloud && bouton) {
+        console.log("BOUTON MAIN");
+        IoJson.listUrlFromDir(thisAppdata.pathAppData + '/data/')
+            .then((files: string[]) => {
+                // console.log('pathAppData', files);
+                each(files, (url) => {
+                    cloud.getDocument('ip', url).then((document: { id: any; data: () => any; }) => {
+                        const data: any = document.data();
+                        console.log('getDocument', data);
+                        if (data) {
+                            IoJson.saveFile(IoJson.resolvePath(
+                                    thisAppdata.pathAppData + '/data/' + url),
+                                JSON.stringify(document)
+                            ).then(() => {
+                                console.log('OK');
+                                return true;
+                            });
+                        }
+                    });
+                });
+            });
+    }
+
+    // return false;
+});
+
+ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: string) => {
+    return IoJson.loadURL(url).then((file: any) => {
+        return GetIP.checkFormatsInterface(file[0],
+            () => {
+                console.log("netflix");
+                config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
+                GetIP.getIP(file[0],
+                    config.directoryOrFilePath,
+                    config); // them
+
+                config.lastExecution = new Date();
+                return thisAppdata.setConfig(config).then((configThen) => {
+                    return true;
+                });
+
+            },
+            () => {
+                console.log("GEO");
+                return thisAppdata.set(GetIP.checkFormatsInterface(file[0]), file[0], 'data')
+                    .then(() => {
+                        console.log("GEO OK");
+                        // Update
+                        return true;
+                    });
+            },
+            null, null, null, null,
+            () => {
+                console.log("CONFIG");
+                config.serviceAccount = file[0];
+                return thisAppdata.setConfig(config).then((configThen) => {
+                    return true;
+                });
+            },
+        );
+    });
+});
+
+
 console.log('PRET');
-
-
 
