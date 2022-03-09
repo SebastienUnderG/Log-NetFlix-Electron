@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-import {app, BrowserWindow, ipcMain, Menu} from 'electron';
+import {app, BrowserWindow, ipcMain, Menu, MessageChannelMain} from 'electron';
 import {GetIP} from '../../Export-Log-NetFlix-Chrome/src/getIP';
 import {Appdata} from '../../Export-Log-NetFlix-Chrome/src/appdata';
 import {ConfigFile} from '../../Export-Log-NetFlix-Chrome/src/configFile';
@@ -8,15 +8,12 @@ import {Cloud} from '../../Export-Log-NetFlix-Chrome/src/cloud';
 import {each} from 'async';
 
 let path = require('path');
-
-
-// const root = path.resolve(__dirname, '../');
+let mainWindow: Electron.BrowserWindow = undefined;
 
 function createWindow() {
     // Create the browser window.
-
-    const mainWindow = new BrowserWindow({
-        width: 700,
+    mainWindow = new BrowserWindow({
+        width: 1000,
         height: 1000,
         minWidth: 500,
         minHeight: 100,
@@ -63,23 +60,8 @@ app.on('activate', function () {
 
 Menu.setApplicationMenu(null);
 
-ipcMain.on('listurl', (event) => {
-    const port = event.ports[0];
-
-
-    port.on('message', (event) => {
-        const data = event.data;
-        setTimeout(() => {
-            port.postMessage({test: 21});
-        }, 1000);
-    });
-
-    // MessagePortMain queues messages until the .start() method has been called.
-    port.start();
-});
-
-
 ipcMain.handle('checkFormatsInterface', async (event: Electron.IpcMainInvokeEvent, url) => {
+
     return IoJson.loadURL(url).then((file: any) => {
         GetIP.checkFormatsInterface(file[0],
             null,
@@ -176,6 +158,7 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
 
                 config.lastExecution = new Date();
                 return thisAppdata.setConfig(config).then((configThen) => {
+                    mainWindow.webContents.send('updateAppData');
                     return true;
                 });
 
@@ -203,4 +186,3 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
 
 
 console.log('PRET');
-

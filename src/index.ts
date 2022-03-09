@@ -15,6 +15,13 @@ ipcRenderer.invoke('pathAppData', null).then((files: Record<string, number>) => 
     informationAppdata(files);
 });
 
+ipcRenderer.on('updateAppData', (event: Electron.IpcRendererEvent, savedPref) => {
+    clearinformationAppdata();
+    ipcRenderer.invoke('pathAppData', null).then((files: Record<string, number>) => {
+        informationAppdata(files);
+    });
+});
+
 function clearinformationAppdata() {
     const tbody: HTMLElement = document.getElementById("tbody");
     tbody.remove();
@@ -219,5 +226,4 @@ function messageNote(files: FileList, i: number, ok: boolean, comment?: string):
     div.appendChild(text);
     return div;
 }
-
 
