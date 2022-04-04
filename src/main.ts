@@ -154,12 +154,14 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
                 config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
                 GetIP.getIP(file[0],
                     config.directoryOrFilePath,
-                    config); // them
+                    config).then(() => {
 
-                config.lastExecution = new Date();
-                return thisAppdata.setConfig(config).then((configThen) => {
-                    mainWindow.webContents.send('updateAppData');
-                    return true;
+                    config.lastExecution = new Date();
+                    return thisAppdata.setConfig(config).then((configThen) => {
+                        mainWindow.webContents.send('updateAppData');
+                        return true;
+                    });
+
                 });
 
             },

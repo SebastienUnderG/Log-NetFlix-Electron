@@ -52,8 +52,6 @@ ipcRenderer.invoke('majCloud', false).then((config) => {
 
 
 // Elements
-const actionBtn: HTMLElement = document.getElementById("action-btn");
-let boutonValide: HTMLLinkElement = <HTMLLinkElement>document.getElementById("action-btn");
 const dropzone: EventTarget = document.getElementById("dropzone");
 const dropzoneHTML: HTMLElement = document.getElementById("listResult");
 
@@ -96,10 +94,6 @@ dropzone.addEventListener('drop', (event: InputEvent) => {
 
     // console.log(event);
     const files: FileList = event.dataTransfer.files;
-
-    // boutons
-    boutonValide.disabled = false;
-
 
     for (let i = 0; i < files.length; i++) {
         if (listResult.includes(files.item(i).path)) {
@@ -201,11 +195,6 @@ dropzone.addEventListener('drop', (event: InputEvent) => {
 
         }
     }
-
-    // boutons
-    actionBtn.addEventListener("mousedown", () => {
-        console.log("-->", listResult);
-    });
 
 });
 
