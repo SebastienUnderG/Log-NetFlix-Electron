@@ -65,7 +65,7 @@ document.getElementById("min-btn").addEventListener("click", function (e) {
 
 document.getElementById("folder-btn").addEventListener("click", function (e) {
     ipcRenderer.invoke('appdata', null).then((urlAppdata) => {
-        shell.openPath(urlAppdata + '/data/');
+        shell.openPath(urlAppdata + '\\data\\');
     });
 });
 

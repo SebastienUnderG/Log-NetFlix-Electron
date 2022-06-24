@@ -5,6 +5,7 @@ import {Appdata} from '../../Export-Log-NetFlix-Chrome/src/appdata';
 import {ConfigFile} from '../../Export-Log-NetFlix-Chrome/src/configFile';
 import {IoJson} from '../../Export-Log-NetFlix-Chrome/src/ioJson';
 import {Cloud} from '../../Export-Log-NetFlix-Chrome/src/cloud';
+import {FormatGeo} from '../../Export-Log-NetFlix-Chrome/src/formatGeo';
 import {each} from 'async';
 
 let path = require('path');
@@ -63,11 +64,11 @@ Menu.setApplicationMenu(null);
 ipcMain.handle('checkFormatsInterface', async (event: Electron.IpcMainInvokeEvent, url) => {
 
     return IoJson.loadURL(url).then((file: any) => {
-        GetIP.checkFormatsInterface(file[0],
+        FormatGeo.checkFormatsInterface(file[0],
             null,
             () => {
                 console.log("GEO");
-                thisAppdata.get(GetIP.checkFormatsInterface(file[0]))
+                thisAppdata.get(FormatGeo.checkFormatsInterface(file[0]))
                     .then((fileLocal: any) => {
                         console.log("->", Object.keys(fileLocal).length, Object.keys(file[0]).length);
                     }).catch((e) => {
@@ -80,7 +81,7 @@ ipcMain.handle('checkFormatsInterface', async (event: Electron.IpcMainInvokeEven
             null
         );
 
-        return GetIP.checkFormatsInterface(file[0]);
+        return FormatGeo.checkFormatsInterface(file[0]);
     });
 });
 
@@ -148,12 +149,11 @@ ipcMain.handle('majCloud', async (event: Electron.IpcMainInvokeEvent, bouton) =>
 
 ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: string) => {
     return IoJson.loadURL(url).then((file: any) => {
-        return GetIP.checkFormatsInterface(file[0],
+        return FormatGeo.checkFormatsInterface(file[0],
             () => {
                 console.log("netflix");
                 config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
                 GetIP.getIP(file[0],
-                    config.directoryOrFilePath,
                     config).then(() => {
 
                     config.lastExecution = new Date();
@@ -167,7 +167,7 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
             },
             () => {
                 console.log("GEO");
-                return thisAppdata.set(GetIP.checkFormatsInterface(file[0]), file[0], 'data')
+                return thisAppdata.set(FormatGeo.checkFormatsInterface(file[0]), file[0], 'data')
                     .then(() => {
                         console.log("GEO OK");
                         // Update
