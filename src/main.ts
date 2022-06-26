@@ -64,22 +64,16 @@ Menu.setApplicationMenu(null);
 ipcMain.handle('checkFormatsInterface', async (event: Electron.IpcMainInvokeEvent, url) => {
 
     return IoJson.loadURL(url).then((file: any) => {
-        FormatGeo.checkFormatsInterface(file[0],
-            null,
-            () => {
-                console.log("GEO");
-                thisAppdata.get(FormatGeo.checkFormatsInterface(file[0]))
-                    .then((fileLocal: any) => {
-                        console.log("->", Object.keys(fileLocal).length, Object.keys(file[0]).length);
-                    }).catch((e) => {
-                    console.error("-> ERREUR", Object.keys(file[0]).length);
-                });
-            },
-            null,
-            null,
-            null,
-            null
-        );
+
+        if (FormatGeo.isInterfaceIGeo(file[0])) {
+            console.log("GEO");
+            thisAppdata.get(FormatGeo.checkFormatsInterface(file[0]))
+                .then((fileLocal: any) => {
+                    console.log("->", Object.keys(fileLocal).length, Object.keys(file[0]).length);
+                }).catch((e) => {
+                console.error("-> ERREUR", Object.keys(file[0]).length);
+            });
+        }
 
         return FormatGeo.checkFormatsInterface(file[0]);
     });
@@ -173,7 +167,7 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
                 });
         }
 
-        if (FormatGeo.isInterfaceFirebase(file[0])){
+        if (FormatGeo.isInterfaceFirebase(file[0])) {
             console.log("CONFIG");
             config.serviceAccount = file[0];
             return thisAppdata.setConfig(config).then((configThen) => {
