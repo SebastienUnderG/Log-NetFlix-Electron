@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-import {app, BrowserWindow, ipcMain, Menu, MessageChannelMain} from 'electron';
+import {app, BrowserWindow, ipcMain, Menu} from 'electron';
 import {GetIP} from '../../Export-Log-NetFlix-Chrome/src/getIP';
 import {Appdata} from '../../Export-Log-NetFlix-Chrome/src/appdata';
 import {ConfigFile} from '../../Export-Log-NetFlix-Chrome/src/configFile';
@@ -149,40 +149,39 @@ ipcMain.handle('majCloud', async (event: Electron.IpcMainInvokeEvent, bouton) =>
 
 ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: string) => {
     return IoJson.loadURL(url).then((file: any) => {
-        return FormatGeo.checkFormatsInterface(file[0],
-            () => {
-                console.log("netflix");
-                config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
-                GetIP.getIP(file[0],
-                    config).then(() => {
 
-                    config.lastExecution = new Date();
-                    return thisAppdata.setConfig(config).then((configThen) => {
-                        mainWindow.webContents.send('updateAppData');
-                        return true;
-                    });
+        if (FormatGeo.isInterfaceIpNetflix(file[0])) {
+            console.log("Netflix");
+            config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
+            GetIP.getIP(file[0], config).then(() => {
 
-                });
-
-            },
-            () => {
-                console.log("GEO");
-                return thisAppdata.set(FormatGeo.checkFormatsInterface(file[0]), file[0], 'data')
-                    .then(() => {
-                        console.log("GEO OK");
-                        // Update
-                        return true;
-                    });
-            },
-            null, null, null, null,
-            () => {
-                console.log("CONFIG");
-                config.serviceAccount = file[0];
+                config.lastExecution = new Date();
                 return thisAppdata.setConfig(config).then((configThen) => {
+                    mainWindow.webContents.send('updateAppData');
                     return true;
                 });
-            },
-        );
+            });
+        }
+
+        if (FormatGeo.isInterfaceIGeo(file[0])) {
+            console.log("GEO");
+            return thisAppdata.set(FormatGeo.checkFormatsInterface(file[0]), file[0], 'data')
+                .then(() => {
+                    console.log("GEO OK");
+                    // Update
+                    return true;
+                });
+        }
+
+        if (FormatGeo.isInterfaceFirebase(file[0])){
+            console.log("CONFIG");
+            config.serviceAccount = file[0];
+            return thisAppdata.setConfig(config).then((configThen) => {
+                return true;
+            });
+        }
+
+
     });
 });
 
