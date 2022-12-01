@@ -105,6 +105,7 @@ ipcMain.handle('config', async (event: Electron.IpcMainInvokeEvent) => {
 let cloud: Cloud = null;
 
 ipcMain.handle('majCloud', async (event: Electron.IpcMainInvokeEvent, bouton) => {
+
     console.log("BOUTON MAIN", bouton, cloud);
     if (!cloud && config.serviceAccount) {
         cloud = new Cloud(config.serviceAccount);
@@ -115,6 +116,7 @@ ipcMain.handle('majCloud', async (event: Electron.IpcMainInvokeEvent, bouton) =>
                 }
             });
     }
+
     if (cloud && bouton) {
         console.log("BOUTON MAIN");
         IoJson.listUrlFromDir(thisAppdata.pathAppData + '/data/')
@@ -146,7 +148,9 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
 
         if (FormatGeo.isInterfaceIpNetflix(file[0])) {
             console.log("Netflix");
-            config.directoryOrFilePath = thisAppdata.pathAppData + '/data/';
+            config.directoryOrFilePath = thisAppdata.pathAppData + '\\data\\';
+            console.log("->", config);
+
             GetIP.getIP(file[0], config).then(() => {
 
                 config.lastExecution = new Date();
@@ -155,6 +159,8 @@ ipcMain.handle('actionBtn', async (event: Electron.IpcMainInvokeEvent, url: stri
                     return true;
                 });
             });
+
+
         }
 
         if (FormatGeo.isInterfaceIGeo(file[0])) {

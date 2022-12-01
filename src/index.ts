@@ -59,8 +59,8 @@ document.getElementById("close-btn").addEventListener("click", function (e) {
     window.close();
 });
 
-document.getElementById("min-btn").addEventListener("click", function (e) {
-    console.log(e);
+document.getElementById("min-btn").addEventListener("click", function (event) {
+    console.log(event);
 });
 
 document.getElementById("folder-btn").addEventListener("click", function (e) {

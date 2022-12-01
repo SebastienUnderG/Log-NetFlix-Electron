@@ -49,7 +49,7 @@ module.exports = {
 */
 
 module.exports = {
-    mode: 'production', // development ou production
+    mode: 'development', // development ou production
     devtool: 'cheap-module-source-map',
     entry: {
         main : './src/main.ts',
